@@ -1,0 +1,53 @@
+package rules;
+dialect  "mvel"
+
+import com.ruijie.mm.client.service.drools.Obj;
+
+global com.ruijie.mm.client.service.drools.DroolsResult droolsResult;
+
+declare Obj
+    @role( event )
+end
+
+rule "DrlTest"
+attributes
+    no-loop
+when
+    num:Number() from accumulate(
+        obj:Obj() over window:time(10s),
+         init( double total = 0.0; ),
+                         action( total += obj.getValue(); ),
+                         result( total ))
+then
+    droolsResult.setResult(String.valueOf(num));
+end
+
+rule "DrlTest2"
+attributes
+    no-loop
+when
+    obj:Obj(value==6)
+then
+    retract(obj)
+end
+
+//rule "DrlTest2"
+//attributes
+//    no-loop
+//when
+//    obj:Obj(mac == "2222.2222.2222")
+//then
+//    obj.setMac("2222.2222.3333");
+//    update(obj)
+//    droolsResult.setResult("2");
+//end
+//
+//rule "DrlTest3"
+//attributes
+//    no-loop
+//when
+//    obj:Obj(mac == "2222.2222.3333")
+//    obj2:Obj(mac == "1111.1111.2222")
+//then
+//    droolsResult.setResult("3");
+//end
